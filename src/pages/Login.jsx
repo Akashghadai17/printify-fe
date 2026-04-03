@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import API from '../api'
 
 export default function Login() {
   const [tab, setTab] = useState('login')
@@ -14,7 +15,7 @@ export default function Login() {
   async function handleLogin(e) {
     e.preventDefault()
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch(`${API}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: form.email, password: form.password })
@@ -31,7 +32,7 @@ export default function Login() {
     e.preventDefault()
     if (form.password.length < 6) return setMsg({ text: 'Password must be at least 6 characters', type: 'error' })
     try {
-      const res = await fetch('/api/register', {
+      const res = await fetch(`${API}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: form.name, email: form.email, password: form.password })
