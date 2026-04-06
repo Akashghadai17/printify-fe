@@ -20,8 +20,10 @@ export default function Admin() {
 
   if (!token) navigate('/admin-login')
 
+  const API = import.meta.env.VITE_API_URL || 'https://prinify-be.onrender.com'
+
   function apiFetch(url, opts = {}) {
-    return fetch(url, { ...opts, headers: { ...(opts.headers || {}), 'x-admin-token': token } })
+    return fetch(`${API}${url}`, { ...opts, headers: { ...(opts.headers || {}), 'x-admin-token': token } })
   }
 
   async function loadOrders() {
@@ -95,7 +97,7 @@ export default function Admin() {
       <nav className="bg-white shadow px-6 py-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <i className="fas fa-print text-primary text-2xl"></i>
-          <span className="text-xl font-bold text-primary">StudentPrint</span>
+          <span className="text-xl font-bold text-primary">Printifyy</span>
           <span className="ml-2 text-sm bg-blue-100 text-primary px-2 py-0.5 rounded font-semibold">Admin</span>
         </div>
         <div className="flex items-center gap-4">
@@ -177,7 +179,7 @@ export default function Admin() {
                         </td>
                         <td className="px-4 py-3">
                           {o.fileName
-                            ? <a href={`/uploads/${o.fileName}`} target="_blank" rel="noreferrer" className="text-primary hover:underline text-xs"><i className="fas fa-file-pdf mr-1"></i>{o.fileName}</a>
+                            ? <a href={`${API}/uploads/${o.fileName}`} target="_blank" rel="noreferrer" className="text-primary hover:underline text-xs"><i className="fas fa-file-pdf mr-1"></i>{o.fileName}</a>
                             : <span className="text-gray-400">—</span>}
                         </td>
                         <td className="px-4 py-3 text-gray-700">{o.copies}</td>

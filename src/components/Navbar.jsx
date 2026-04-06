@@ -24,7 +24,7 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <i className="fas fa-print text-primary text-2xl mr-2"></i>
-            <span className="text-xl font-bold text-primary">StudentPrint</span>
+            <span className="text-xl font-bold text-primary">Printifyy</span>
           </div>
           <div className="hidden md:flex items-center space-x-6">
             {['home','upload','packages','about','contact'].map(id => (

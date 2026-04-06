@@ -1,27 +1,36 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+const API = import.meta.env.VITE_API_URL || 'https://prinify-be.onrender.com'
+
 export default function AdminLogin() {
   const [form, setForm] = useState({ username: '', password: '' })
   const [msg, setMsg] = useState('')
   const [show, setShow] = useState(false)
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
   if (sessionStorage.getItem('adminToken')) navigate('/admin')
 
   async function handleSubmit(e) {
     e.preventDefault()
+    setLoading(true)
+    setMsg('')
     try {
-      const res = await fetch('/api/admin/login', {
+      const res = await fetch(`${API}/api/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       })
       const data = await res.json()
-      if (!res.ok) return setMsg(data.message)
+      if (!res.ok) return setMsg(data.message || 'Invalid credentials')
       sessionStorage.setItem('adminToken', data.token)
       navigate('/admin')
-    } catch { setMsg('Server error. Please try again.') }
+    } catch {
+      setMsg('Server is waking up, please try again in a moment.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -30,11 +39,11 @@ export default function AdminLogin() {
         <div className="text-center mb-8">
           <i className="fas fa-shield-alt text-primary text-4xl"></i>
           <h1 className="text-2xl font-bold text-gray-800 mt-2">Admin Access</h1>
-          <p className="text-gray-500 text-sm mt-1">StudentPrint Dashboard</p>
+          <p className="text-gray-500 text-sm mt-1">Printifyy Dashboard</p>
         </div>
         {msg && <div className="mb-4 p-3 rounded-lg text-sm text-center bg-red-100 text-red-700">{msg}</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input type="text" required placeholder="admin" value={form.username}
+          <input type="text" required placeholder="Username" value={form.username}
             onChange={e => setForm({ ...form, username: e.target.value })}
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
           <div className="relative">
@@ -45,8 +54,8 @@ export default function AdminLogin() {
               <i className={`fas ${show ? 'fa-eye-slash' : 'fa-eye'}`}></i>
             </button>
           </div>
-          <button type="submit" className="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">
-            <i className="fas fa-sign-in-alt mr-2"></i>Login
+          <button type="submit" disabled={loading} className="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-60">
+            {loading ? 'Logging in...' : <><i className="fas fa-sign-in-alt mr-2"></i>Login</>}
           </button>
         </form>
         <p className="text-center mt-4 text-sm text-gray-400">

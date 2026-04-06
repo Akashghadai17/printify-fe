@@ -11,7 +11,7 @@ export default function Contact() {
             </div>
             <div>
               <i className="fas fa-envelope text-primary text-2xl mb-2"></i>
-              <p className="text-gray-600 dark:text-gray-300">Email: info@studentprint.com</p>
+              <p className="text-gray-600 dark:text-gray-300">Email: info@printifyy.in</p>
             </div>
             <button onClick={() => window.open('https://wa.me/916371272308', '_blank')}
               className="bg-green-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-600 transition flex items-center">

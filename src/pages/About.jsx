@@ -10,7 +10,7 @@ export default function About() {
           </div>
           <div>
             <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">How We Solve It</h3>
-            <p className="text-gray-600 dark:text-gray-400">StudentPrint brings printing to your doorstep. With affordable ₹2 per page rates, free delivery near the college back gate, and flexible packages, we make your academic life easier. Fast, reliable, and student-focused!</p>
+            <p className="text-gray-600 dark:text-gray-400">Printifyy brings printing to your doorstep. With affordable ₹2 per page rates, free delivery near the college back gate, and flexible packages, we make your academic life easier. Fast, reliable, and student-focused!</p>
           </div>
         </div>
       </div>

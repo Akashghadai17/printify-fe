@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <section id="home" className="pt-20 pb-16 bg-gradient-to-r from-primary to-secondary text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 className="text-4xl md:text-6xl font-bold mb-6">Affordable Printing for Busy Students</h1>
+        <h1 className="text-4xl md:text-6xl font-bold mb-6">Affordable Printing with Printifyy</h1>
         <p className="text-xl mb-8 max-w-3xl mx-auto">
           Say goodbye to long queues and high prices. Get your assignments printed and delivered right to the college back gate for just ₹2 per page.
         </p>

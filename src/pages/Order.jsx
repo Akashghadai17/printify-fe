@@ -7,6 +7,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString()
 
+const API = import.meta.env.VITE_API_URL || 'https://prinify-be.onrender.com'
 const RATES = { 'One-time': 2, 'Monthly': 1.5, 'Quarterly': 1.2, 'Half-Yearly': 1, 'Yearly': 0.8 }
 const COLOUR_EXTRA = 5
 const PAYMENT_METHODS = [
@@ -31,6 +32,8 @@ export default function Order() {
   const [deliveryTime, setDeliveryTime] = useState('')
   const [orderSuccess, setOrderSuccess] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [aiAnalysis, setAiAnalysis] = useState(null)
+  const [analyzing, setAnalyzing] = useState(false)
   const MERCHANT_UPI = "itshitanshu@okaxis" // Change this to your actual UPI ID
 
   async function handleFile(e) {
@@ -43,6 +46,25 @@ export default function Order() {
       setPageTypes(Array(pdf.numPages).fill('bw'))
     } else {
       setDetectedPages(0)
+    }
+  }
+
+  async function analyzeFile() {
+    const file = fileRef.current?.files[0]
+    if (!file) return;
+    setAnalyzing(true);
+    setAiAnalysis(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch(`${API}/api/ai/analyze`, { method: 'POST', body: formData });
+      const data = await res.json();
+      setAiAnalysis(data.summary);
+    } catch (err) {
+      console.error(err);
+      setAiAnalysis("AI analysis failed.");
+    } finally {
+      setAnalyzing(false);
     }
   }
 
@@ -80,6 +102,7 @@ export default function Order() {
     if (!fileRef.current?.files[0]) { alert('Please upload a file.'); return }
     if (!detectedPages) { alert('Could not detect pages. Please upload a valid PDF.'); return }
     setSubmitting(true)
+    try {
     const formData = new FormData()
     formData.append('file', fileRef.current.files[0])
     formData.append('copies', copies)
@@ -95,18 +118,22 @@ export default function Order() {
     formData.append('totalPrice', price?.total || 0)
     formData.append('bwPages', printType === 'mixed' ? pageTypes.filter(t => t === 'bw').length : printType === 'bw' ? detectedPages : 0)
     formData.append('colourPages', printType === 'mixed' ? pageTypes.filter(t => t === 'colour').length : printType === 'colour' ? detectedPages : 0)
-    const res = await fetch('/api/orders', { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: formData })
+    const res = await fetch(`${API}/api/orders`, { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: formData })
     const data = await res.json()
     if (res.ok) {
       setOrderSuccess(true)
     } else {
       alert(data.message)
     }
+    } catch (err) {
+      alert('Error placing order: ' + err.message)
+    } finally {
     setSubmitting(false)
+    }
   }
 
   if (orderSuccess) {
-    const upiUrl = `upi://pay?pa=${MERCHANT_UPI}&pn=StudentPrint&am=${price.total.toFixed(2)}&cu=INR&tn=StudentPrint%20Order`
+    const upiUrl = `upi://pay?pa=${MERCHANT_UPI}&pn=Printifyy&am=${price.total.toFixed(2)}&cu=INR&tn=Printifyy%20Order`
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`
     
     return (
@@ -152,9 +179,29 @@ export default function Order() {
 
           <div>
             <label className={labelCls}>Upload PDF/Word Assignment</label>
-            <input ref={fileRef} type="file" accept=".pdf,.doc,.docx" onChange={handleFile} className={inputCls} />
+            <div className="flex gap-2">
+              <input ref={fileRef} type="file" accept=".pdf,.doc,.docx" onChange={handleFile} className={inputCls} />
+              {detectedPages > 0 && (
+                <button type="button" onClick={analyzeFile} disabled={analyzing} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center shrink-0">
+                  {analyzing ? <i className="fas fa-spinner fa-spin mr-2"></i> : <i className="fas fa-wand-magic-sparkles mr-2"></i>}
+                  AI Analyze
+                </button>
+              )}
+            </div>
             {detectedPages > 0 && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1"><i className="fas fa-file-alt mr-1"></i>{detectedPages} pages detected</p>}
           </div>
+
+          {aiAnalysis && (
+            <div className="p-4 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 rounded-xl animate-in fade-in slide-in-from-top-2">
+              <div className="flex items-center gap-2 mb-2 text-indigo-700 dark:text-indigo-300 font-semibold">
+                <i className="fas fa-robot text-lg"></i>
+                <span>Printifyy AI Analysis</span>
+              </div>
+              <p className="text-sm text-indigo-900 dark:text-indigo-100 leading-relaxed italic">
+                "{aiAnalysis}"
+              </p>
+            </div>
+          )}
 
           <div>
             <label className={labelCls}>Number of Copies</label>
